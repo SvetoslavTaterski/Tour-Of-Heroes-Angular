@@ -4,7 +4,7 @@ import { Observable, of } from 'rxjs';
 import { Hero } from '../interfaces/HeroInterface';
 import { HEROES } from '../mock-heroes';
 import { MessageService } from './message.service';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { InMemoryDataService } from '../in-memory-data.service';
 import { catchError, map, tap } from 'rxjs/operators';
@@ -43,9 +43,18 @@ export class HeroService implements InMemoryDataService {
   }
 
   getHero(id: number): Observable<Hero> {
-    const hero = HEROES.find((h) => h.id === id)!;
-    this.messageService.add(`HeroService: fetched hero id=${id}`);
-    return of(hero);
+    const url = `${this.heroesUrl}/${id}`;
+    return this.http.get<Hero>(url).pipe(
+      tap(_ => this.log(`fetched hero id=${id}`)),
+      catchError(this.handleError<Hero>(`getHero id=${id}`))
+    );
+  }
+
+  updateHero(hero: Hero): Observable<any> {
+    return this.http.put(this.heroesUrl, hero, this.httpOptions).pipe(
+      tap(_ => this.log(`updated hero id=${hero.id}`)),
+      catchError(this.handleError<any>('updateHero'))
+    );
   }
 
   genId(heroes: Hero[]): number {
@@ -67,4 +76,8 @@ export class HeroService implements InMemoryDataService {
       return of(result as T);
     };
   }
+
+  httpOptions = {
+    headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+  };
 }
