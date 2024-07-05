@@ -64,6 +64,15 @@ export class HeroService implements InMemoryDataService {
     );
   }
 
+  deleteHero(id: number): Observable<Hero> {
+    const url = `${this.heroesUrl}/${id}`;
+  
+    return this.http.delete<Hero>(url, this.httpOptions).pipe(
+      tap(_ => this.log(`deleted hero id=${id}`)),
+      catchError(this.handleError<Hero>('deleteHero'))
+    );
+  }
+
   genId(heroes: Hero[]): number {
     return heroes.length > 0
       ? Math.max(...heroes.map((hero) => hero.id)) + 1
