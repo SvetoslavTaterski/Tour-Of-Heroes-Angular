@@ -6,6 +6,8 @@ import { Hero } from '../interfaces/HeroInterface';
 import { HeroDetailComponent } from '../hero-detail/hero-detail.component';
 import { HeroService } from '../services/hero.service';
 
+import { MessageService } from '../services/message.service';
+
 @Component({
   selector: 'app-heroes',
   standalone: true,
@@ -17,7 +19,7 @@ export class HeroesComponent {
 
   heroes: Hero[] = [];
 
-  constructor(private heroService:HeroService) {
+  constructor(private heroService:HeroService, private messageService: MessageService) {
     
   }
 
@@ -26,7 +28,8 @@ export class HeroesComponent {
   }
 
   getHeroes(): void {
-    this.heroes = this.heroService.getHeroes();
+    this.heroService.getHeroes()
+        .subscribe(heroes => this.heroes = heroes);
   }
 
   hero: Hero = {
@@ -38,6 +41,7 @@ export class HeroesComponent {
   selectedHero?: Hero;
   onSelect(hero: Hero): void {
     this.selectedHero = hero;
+    this.messageService.add(`HeroesComponent: Selected hero id=${hero.id}`);
   }
 
 }
