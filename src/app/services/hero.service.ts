@@ -4,9 +4,10 @@ import { Observable, of } from 'rxjs';
 import { Hero } from '../interfaces/HeroInterface';
 import { HEROES } from '../mock-heroes';
 import { MessageService } from './message.service';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 
 import { InMemoryDataService } from '../in-memory-data.service';
+import { catchError, map, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -35,7 +36,10 @@ export class HeroService implements InMemoryDataService {
   }
 
   getHeroes(): Observable<Hero[]> {
-    return this.http.get<Hero[]>(this.heroesUrl);
+    return this.http.get<Hero[]>(this.heroesUrl).pipe(
+      tap((_) => this.log('fetched heroes')),
+      catchError(this.handleError<Hero[]>('getHeroes', []))
+    );
   }
 
   getHero(id: number): Observable<Hero> {
@@ -52,5 +56,15 @@ export class HeroService implements InMemoryDataService {
 
   private log(message: string) {
     this.messageService.add(`HeroService: ${message}`);
+  }
+
+  private handleError<T>(operation = 'operation', result?: T) {
+    return (error: any): Observable<T> => {
+      console.error(error); // log to console instead
+
+      this.log(`${operation} failed: ${error.message}`);
+
+      return of(result as T);
+    };
   }
 }
