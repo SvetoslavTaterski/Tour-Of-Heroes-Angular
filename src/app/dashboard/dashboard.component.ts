@@ -3,11 +3,12 @@ import { Hero } from '../interfaces/HeroInterface';
 import { HeroService } from '../services/hero.service';
 import {CommonModule, NgFor} from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { HeroSearchComponent } from '../hero-search/hero-search.component';
 
 @Component({
   standalone: true,
   selector: 'app-dashboard',
-  imports: [CommonModule, NgFor, RouterLink],
+  imports: [CommonModule, NgFor, RouterLink, HeroSearchComponent],
   templateUrl: './dashboard.component.html',
   styleUrls: [ './dashboard.component.css' ]
 })
